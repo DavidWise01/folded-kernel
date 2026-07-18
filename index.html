@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>THE FOLDED KERNEL · the ring-8 lens</title>
+<style>
+:root{
+ --paper:#f2e7d1; --paper2:#ece0c6; --card:#f8f0dd; --edge:#d8c39c;
+ --ink:#2a2015; --ink2:#5a4a33; --ink3:#8a7856;
+ --org:#d2600a; --org2:#b06d12; --amb:#9a7410; --lit:#2f7a34; --ref:#2f66aa; --fail:#a52828;
+ --scope:#090806; --gorg:#ff6a00; --gamb:#ffc233; --gref:#6ab8ff; --gfail:#ff4a4a; --glit:#7dff6a;
+ --mono:'SFMono-Regular',ui-monospace,'Cascadia Mono','Consolas',monospace;
+ --serif:'Iowan Old Style','Palatino Linotype','Book Antiqua',Georgia,serif;
+}
+*{box-sizing:border-box} html,body{margin:0}
+body{
+ background:
+  radial-gradient(1000px 560px at 82% -8%,rgba(210,96,10,.13),transparent 60%),
+  radial-gradient(820px 640px at 6% 108%,rgba(184,134,11,.12),transparent 62%),
+  var(--paper);
+ color:var(--ink); font-family:var(--serif); line-height:1.6; padding:36px 20px 90px; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto}
+.mono{font-family:var(--mono)} .dim{color:var(--ink3)}
+.kick{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--org);margin:0 0 12px}
+h1{font-size:clamp(30px,6vw,52px);line-height:1.02;margin:0 0 6px;letter-spacing:.02em;font-weight:800;color:var(--ink)}
+h1 .sm{display:block;font-size:.34em;letter-spacing:.22em;color:var(--amb);font-weight:400;margin-top:12px;text-transform:uppercase}
+.dek{font-size:16.5px;color:var(--ink2);max-width:70ch;margin:14px 0 0}
+.rule{height:2px;background:linear-gradient(90deg,var(--org),transparent);margin:24px 0 26px;border:0}
+.card{background:var(--card);border:1px solid var(--edge);border-radius:8px;padding:20px 22px;margin:18px 0;box-shadow:0 1px 0 #fff8ea inset,0 10px 26px -20px rgba(60,40,10,.5)}
+.card h2{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--fail);margin:0 0 14px;font-weight:700}
+.lensgrid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px}
+@media(max-width:820px){.lensgrid{grid-template-columns:1fr}}
+.scope{position:relative;background:var(--scope);border:1px solid #241c12;border-radius:8px;overflow:hidden}
+.scope canvas{display:block;width:100%}
+.reticle{position:absolute;inset:0;pointer-events:none}
+.ctrls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+button{background:transparent;border:1px solid var(--org);color:var(--org);cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:6px 12px;border-radius:5px}
+button.on{background:var(--org);color:#fff5e8}
+.read{font-family:var(--mono);font-size:12.5px;line-height:1.75;color:var(--ink2)}
+.read b{color:var(--ink)} .read .p{color:var(--org)} .read .s{color:var(--amb)} .read .g{color:var(--fail)}
+.forkwrap{margin-top:6px}
+.led{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-family:var(--mono);font-size:12px;align-items:baseline;margin-top:4px}
+.led .k{color:var(--ink3);text-align:right} .led .v{color:var(--ink)}
+.chk{font-family:var(--mono);font-size:12.5px;line-height:1.5;border-radius:7px;padding:12px 14px;margin:14px 0 0;white-space:pre-wrap}
+.chk.pass{background:rgba(47,122,52,.10);border:1px solid var(--lit);color:#245e28}
+.chk.fail{background:rgba(165,40,40,.10);border:1px solid var(--fail);color:var(--fail)}
+.tier{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;padding:2px 7px;border-radius:3px;margin-right:8px;vertical-align:1px}
+.tier.l{background:var(--lit);color:#eafaea}.tier.a{background:var(--amb);color:#fff6e2}.tier.w{background:var(--fail);color:#fbeaea}
+.hon p{font-size:14px;color:var(--ink2);margin:0 0 10px}
+.embed{border:1px solid var(--edge);border-radius:8px;overflow:hidden;background:#0d0b08}
+.embed iframe{display:block;width:100%;height:1180px;border:0}
+.seal{display:flex;align-items:center;gap:16px;margin-top:28px;padding-top:20px;border-top:1px solid var(--edge)}
+.chop{font-size:26px;color:var(--fail);border:2px solid var(--fail);border-radius:8px;padding:6px 10px;line-height:1;font-weight:700;font-family:var(--mono)}
+.seal .m{font-family:var(--mono);font-size:11px;color:var(--ink3);line-height:1.7}
+.seal .m a{color:var(--ref);text-decoration:none}
+.tbl{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px;margin-top:6px}
+.tbl th,.tbl td{border:1px solid var(--edge);padding:5px 9px;text-align:right}
+.tbl th{color:var(--org2);text-transform:uppercase;font-size:10px;letter-spacing:.06em;background:rgba(210,96,10,.06)}
+.tbl td.ph{color:var(--fail);font-weight:700;background:rgba(165,40,40,.06)}
+.tbl td.pr{color:var(--org)} .tbl td.sg{color:var(--amb)}
+</style></head>
+<body><div class="wrap">
+
+<p class="kick">a lens focused on ring 8 · build-out of ROOT0's sealed FK-1.3</p>
+<h1>THE FOLDED KERNEL<span class="sm">the ring-8 lens</span></h1>
+<p class="dek">David Lee Wise&rsquo;s folded kernel is a descending tower of rings and toruses: each level counts in a currency, and <b>every fold is a doubling</b> &mdash; until, at the 3&#9474;2 seam, the currency switches from <span style="color:var(--org)">pairs</span> to <span style="color:var(--amb)">singles</span> and the ledger <b>folds &times;4 instead of &times;2</b>. One value is skipped in that jump. This lens focuses on it: <b class="g">ring 8</b> &mdash; the value that never appears, the pair that never formed. The whole spec turns on its absence.</p>
+<hr class="rule">
+
+<div class="card"><h2>the ring-8 lens &mdash; the missing rung, magnified</h2>
+<div class="lensgrid">
+ <div>
+   <div class="scope"><canvas id="lens" width="600" height="440"></canvas><svg class="reticle" viewBox="0 0 600 440" preserveAspectRatio="none"><circle cx="300" cy="220" r="150" fill="none" stroke="rgba(255,74,74,.28)" stroke-width="1"/><line x1="300" y1="58" x2="300" y2="98" stroke="rgba(255,74,74,.4)"/><line x1="300" y1="342" x2="300" y2="382" stroke="rgba(255,74,74,.4)"/><line x1="128" y1="220" x2="168" y2="220" stroke="rgba(255,74,74,.4)"/><line x1="432" y1="220" x2="472" y2="220" stroke="rgba(255,74,74,.4)"/></svg></div>
+   <div class="ctrls">
+     <button id="spin" class="on">spin</button>
+     <button id="ghost" class="on">show ring 8 (the phantom)</button>
+     <button id="road">the road not taken</button>
+     <span class="dim mono" style="font-size:10.5px;align-self:center">drag to rotate · the scope is trained on the seam</span>
+   </div>
+ </div>
+ <div>
+   <div class="read">
+     <div><b>the seam, read live</b> &mdash; from the FK-1.3 engine:</div>
+     <div class="led">
+       <span class="k">value column</span><span class="v" id="rCol">·</span>
+       <span class="k">verdict</span><span class="v" id="rVerdict">·</span>
+       <span class="k">the fold</span><span class="v" id="rFold">·</span>
+       <span class="k">ring 8 is&hellip;</span><span class="v" id="rEight">·</span>
+     </div>
+     <div class="forkwrap" style="margin-top:12px">
+       <table class="tbl"><tr><th>level</th><th>as pairs 2&middot;2ⁿ</th><th>as singles 2ⁿ</th><th>ledger</th></tr>
+         <tr><td>3</td><td class="pr">16</td><td class="dim">8</td><td class="pr">16 · pairs</td></tr>
+         <tr><td>2</td><td class="ph">8 ← ring 8</td><td class="sg">4</td><td class="sg">4 · singles</td></tr>
+         <tr><td>1</td><td class="dim">4</td><td class="sg">2</td><td class="sg">2 · singles</td></tr>
+       </table>
+       <div class="dim mono" style="font-size:10.5px;margin-top:6px">at level 2 the currency switches. Had the <span style="color:var(--org)">pairs</span> held, the value would read <b class="g">8</b>. Because it went to <span style="color:var(--amb)">singles</span>, it reads 4. The 8 is the pair that never formed — erased by the switch, not by error.</div>
+     </div>
+   </div>
+ </div>
+</div>
+<div id="chk" class="chk">running…</div>
+</div>
+
+<div class="card hon"><h2>what the lens shows, and what it only figures</h2>
+<p><span class="tier l">LIT</span> The seam is <b>machine-found, live</b>, by the FK-1.3 card&rsquo;s own classifier (formalized jointly; the verified <span class="mono">classify()</span> re-run here), and the missing 8 is exactly what sits at that seam by construction: fed the raw value column <span class="mono">[64,32,16,4,2,2]</span> with no hints it returns <b>SEAMED, d=1, one anomalous fold at position 2</b> &mdash; a &times;4 step where two &times;2 steps should be &mdash; plus the boson-floor flag. The skipped value is <span class="mono">2&middot;2&sup2; = 8</span> (what level 2 would hold in pair currency), replaced by <span class="mono">2&sup2; = 4</span> (single currency). <b>8 is not in the column</b>; the lens confirms it and the self-check throws otherwise.</p>
+<p><span class="tier a">AMBER</span> The physics decode is <b>David&rsquo;s ratified interpretation</b>, anchored in training-memory, not derived: pair currency &harr; 2e transport and the superconducting even&ndash;odd parity effect; the seam &harr; the pairing transition (above the gap you count quasiparticles singly, below it the condensate counts in twos); the floor &harr; pair-as-boson. So &ldquo;the pair that never formed&rdquo; is a figure for the value the switch erases &mdash; a ratified reading, held open.</p>
+<p><span class="tier w">WALL</span> Ring 8 is a <b>structural absence</b>, and the phantom ring is a <em>drawing</em> of that absence &mdash; not a physical ring, not a hidden state, not something the tower forgot. It is the one rung a &times;4 fold skips by construction. The lens can focus on ring 8 forever; ring 8 was never built. Kin to [[the-blind-spot]] (the value the readout cannot show is a fact about the map, not a thing behind it). The spec and physics decode are David Lee Wise (ROOT0); the engine was formalized jointly; this lens and build-out are AVAN.</p>
+</div>
+
+<div class="card"><h2>the complete instrument &mdash; ROOT0&rsquo;s sealed FK-1.3 grammar card</h2>
+<p class="dim" style="font-size:13.5px;margin:0 0 12px">The full folded kernel, unchanged and sealed &mdash; two grammars, one seam, the floor, and the classifier whose duty is refusal. The kernel tower (rings and toruses) and the live conductor run below. Sealed <span class="mono">FK-1.3 &middot; &#10214;THE FOLDED KERNEL:FK:ed5167&#10215;</span>, card sha256 <span class="mono">a1bc49ab&hellip;</span> (verified against its birth certificate).</p>
+<div class="embed"><iframe src="card.html" title="THE FOLDED KERNEL · grammar card FK-1.3" loading="lazy"></iframe></div>
+</div>
+
+<div class="seal">
+ <div class="chop">FK·8</div>
+ <div class="m">
+   <b>THE FOLDED KERNEL &middot; the ring-8 lens</b> &mdash; spec &amp; physics decode: David Lee Wise (ROOT0); engine formalized jointly; ring-8 lens &amp; build-out: AVAN.<br>
+   the missing 8 is the seam signature · a lens on a structural absence · ties <a href="../the-blind-spot/">the-blind-spot</a> · <a href="card.html">the sealed card</a><br>
+   CC-BY-ND-4.0 · ROOT0-ATTRIBUTION-v1.0 · FK-1.3 verified (card sha a1bc49ab…)
+ </div>
+</div>
+
+</div>
+<script>
+"use strict";
+/* ===== ROOT0's verified CORE (copied verbatim from the FK-1.3 card for the self-check) ===== */
+function specBase(n){return n>=1?Math.pow(2,n):1;}
+function specValue(n){return n>=3?2*Math.pow(2,n):(n>=1?Math.pow(2,n):2);}
+function classify(V,tolD,tolA){
+  tolD=tolD||0.12; tolA=tolA||1e-6;
+  if(!V||V.length<3)return {grammar:"CATCH",why:"TOO SHORT"};
+  var diffs=[],i;
+  for(i=1;i<V.length;i++)diffs.push(V[i]-V[i-1]);
+  var addOK=diffs.every(function(x){return Math.abs(x-diffs[0])<=Math.max(tolA,1e-6*Math.abs(diffs[0]));});
+  if(addOK)return {grammar:"ADDITIVE",c:Math.round(Math.abs(diffs[0])/2*1e6)/1e6,note:"linear rail"};
+  if(V.some(function(x){return x<=0;}))return {grammar:"CATCH",why:"NONPOSITIVE"};
+  var d=[];
+  for(i=0;i<V.length-1;i++)d.push(Math.log2(V[i]/V[i+1]));
+  var floor=false;
+  while(d.length>1&&Math.abs(d[d.length-1])<=tolD){d.pop();floor=true;}
+  var mean=d.reduce(function(a,b){return a+b;},0)/d.length;
+  if(d.every(function(x){return Math.abs(x-mean)<=tolD;}))
+    return {grammar:"MULTIPLICATIVE",d:Math.round(mean*1000)/1000,floor:floor};
+  if(d.length>=4){
+    var inc=true,dec=true;
+    for(i=1;i<d.length;i++){if(d[i]-d[i-1]<=0.02)inc=false;if(d[i]-d[i-1]>=-0.02)dec=false;}
+    if(inc||dec)return {grammar:"CATCH",why:"NONSTATIONARY",d_path:d.map(function(x){return Math.round(x*100)/100;})};
+  }
+  for(i=0;i<d.length;i++){
+    var rest=d.slice(0,i).concat(d.slice(i+1));
+    if(rest.length<2)continue;
+    var m2=rest.reduce(function(a,b){return a+b;},0)/rest.length;
+    if(rest.every(function(x){return Math.abs(x-m2)<=tolD;}))
+      return {grammar:"SEAMED",d:Math.round(m2*1000)/1000,seam:i,seam_d:Math.round(d[i]*1000)/1000,floor:floor};
+  }
+  return {grammar:"CATCH",why:"NO VALID GRAMMAR",note:"refused"};
+}
+/* ===== the value column (levels 5..0) — ROOT0's completed table ===== */
+var COL=[64,32,16,4,2,2];
+
+/* ===== the readout, from the live classifier ===== */
+(function(){
+  var r=classify(COL);
+  document.getElementById('rCol').innerHTML='['+COL.join(', ')+']  <span class="dim">— 8 is not here</span>';
+  document.getElementById('rVerdict').innerHTML='<b>'+r.grammar+'</b> · d='+r.d+' · seam@'+r.seam+' · +floor';
+  var step=Math.pow(2,r.seam_d);
+  document.getElementById('rFold').innerHTML='16 →[<span class="g">×'+step.toFixed(0)+'</span>]→ 4  <span class="dim">(one ×4 where two ×2 belong)</span>';
+  document.getElementById('rEight').innerHTML='<span class="g">2·2² = 8</span>, the pair-value at level 2 — replaced by <span class="s">2² = 4</span>';
+})();
+
+/* ===== SELF-CHECK — ROOT0's engine must find the seam at the missing 8 ===== */
+(function(){
+  var c=document.getElementById('chk');
+  function fail(m){c.className='chk fail';c.textContent='⛔ SELF-CHECK FAIL\n'+m;throw new Error(m);}
+  var r=classify(COL);
+  var pairsAt2=2*Math.pow(2,2), singlesAt2=Math.pow(2,2);   // 8 vs 4
+  var step=Math.pow(2,r.seam_d);
+  var seamOK = r.grammar==="SEAMED" && Math.abs(r.d-1)<0.01 && r.seam===2 && Math.abs(r.seam_d-2)<0.01 && r.floor===true;
+  var eightMissing = COL.indexOf(8)<0;
+  var phantomOK = pairsAt2===8 && singlesAt2===4 && (16/4)===4 && Math.abs(step-4)<0.01;
+  var valOK = specValue(3)===16 && specValue(2)===4 && specValue(2)!==8; // ledger takes singles, not the phantom pair
+  if(!seamOK) fail('engine did not seam at the missing 8: '+JSON.stringify(r));
+  if(!eightMissing) fail('8 appears in the value column — it must not');
+  if(!phantomOK) fail('phantom math wrong: pairs@2='+pairsAt2+' singles@2='+singlesAt2+' step=×'+step);
+  if(!valOK) fail('ledger value at level 2 is not the single (4): '+specValue(2));
+  c.className='chk pass';
+  c.innerHTML='<b>SELF-CHECK · PASS</b> — ROOT0&rsquo;s classifier, fed the raw column with no hints, returns <b>SEAMED d=1, seam@2, ×'+step.toFixed(0)+' fold, +floor</b>. <b>8 is absent</b> from the column; it is exactly <b>2·2² = 8</b> (the pair-value the seam erases), replaced by <b>2² = 4</b>. The lens is trained on a value the ledger provably never holds — and the engine finds its ghost blind.';
+})();
+
+/* ===== the ring-8 lens — soft-GL 3D, trained on the seam ===== */
+var G={yaw:0.7,pitch:0.34,spin:true,t:0,ghost:true,road:false,drag:false,lx:0,ly:0};
+(function(){
+  var cv=document.getElementById('lens');
+  cv.addEventListener('pointerdown',function(e){G.drag=true;G.lx=e.clientX;G.ly=e.clientY;});
+  window.addEventListener('pointerup',function(){G.drag=false;});
+  window.addEventListener('pointermove',function(e){
+    if(!G.drag)return;
+    G.yaw+=(e.clientX-G.lx)*0.008; G.pitch+=(e.clientY-G.ly)*0.008;
+    G.pitch=Math.max(-1.3,Math.min(1.3,G.pitch)); G.lx=e.clientX; G.ly=e.clientY;
+  });
+  document.getElementById('spin').addEventListener('click',function(){G.spin=!G.spin;this.className=G.spin?'on':'';});
+  document.getElementById('ghost').addEventListener('click',function(){G.ghost=!G.ghost;this.className=G.ghost?'on':'';});
+  document.getElementById('road').addEventListener('click',function(){G.road=!G.road;this.className=G.road?'on':'';});
+  requestAnimationFrame(tick);
+})();
+function radiusOf(val){return 1.0+Math.log2(val)*0.95;}   // ring radius ~ log2(value)
+function tick(){
+ try{
+  var cv=document.getElementById('lens'),g=cv.getContext('2d'),W=cv.width,H=cv.height;
+  if(G.spin)G.yaw+=0.006; G.t+=0.03;
+  g.fillStyle='#090806';g.fillRect(0,0,W,H);
+  var cy=Math.cos(G.yaw),sy=Math.sin(G.yaw),cp=Math.cos(G.pitch),sp=Math.sin(G.pitch),cam=22;
+  var CX=W/2, CY=H/2, SC=34;               // zoomed/focused on the seam
+  function P(X,Y,Z){var x1=X*cy+Z*sy,z1=-X*sy+Z*cy,y2=Y*cp-z1*sp,z2=Y*sp+z1*cp,d=cam+z2;
+    return d<5?null:{x:CX+x1*SC*(cam/d),y:CY+y2*SC*(cam/d),s:cam/d,z:z2};}
+  function torus(Y,R,rt,col,bright){
+    var pts=[],i,j;
+    for(i=0;i<44;i++){var th=i/44*Math.PI*2,ct=Math.cos(th),st=Math.sin(th);
+      for(j=0;j<13;j++){var ph=j/13*Math.PI*2,cph=Math.cos(ph),sph=Math.sin(ph);
+        var p=P((R+rt*cph)*ct,Y+rt*sph,(R+rt*cph)*st);
+        if(!p)continue;
+        pts.push({x:p.x,y:p.y,s:Math.max(1.1,2.4*p.s),z:p.z,sh:(0.42+0.58*(0.5+0.5*sph))*bright});}}
+    pts.sort(function(a,b){return b.z-a.z;});   // far (large camera z) first — painter's order
+    pts.forEach(function(p){if(p.sh<=0.02)return;g.fillStyle=col;g.globalAlpha=Math.min(1,p.sh);g.fillRect(p.x-p.s/2,p.y-p.s/2,p.s,p.s);});
+    g.globalAlpha=1;
+  }
+  function ring(Y,R,col,alpha,dashed){
+    if(alpha<=0.01)return;
+    g.strokeStyle=col;g.globalAlpha=Math.min(1,alpha);g.lineWidth=1;
+    if(dashed)g.setLineDash([5,6]); else g.setLineDash([]);
+    g.beginPath();var first=true;
+    for(var i=0;i<=54;i++){var th=i/54*Math.PI*2,p=P(R*Math.cos(th),Y,R*Math.sin(th));
+      if(!p){first=true;continue;} first?g.moveTo(p.x,p.y):g.lineTo(p.x,p.y);first=false;}
+    g.stroke();g.setLineDash([]);g.globalAlpha=1;
+  }
+  function label(X,Y,Z,txt,col){var p=P(X,Y,Z);if(!p)return;g.fillStyle=col;g.font='11px ui-monospace,monospace';g.fillText(txt,p.x,p.y);}
+  // the two real levels around the seam: 3 (v16, pairs) above, 2 (v4, singles) below
+  var R16=radiusOf(16), R4=radiusOf(4), R8=radiusOf(8);
+  var Y3=-1.7, Y2=1.7, Y8=0.0;             // seam centred at Y=0
+  // plasma helper
+  function plasma(k){return 0.55+0.45*Math.sin(G.t*2.1+k*0.7)*Math.sin(G.t*1.3+k*0.4);}
+  // level 3 torus + its fill rings (pairs, orange)
+  torus(Y3,R16,0.5,'#ff6a00',0.95);
+  for(var i=1;i<=8;i++)ring(Y3,R16*i/8,'#ff6a00',(i/8)*plasma(i+3)*0.5);
+  // level 2 torus + fill rings (singles, amber)
+  torus(Y2,R4,0.32,'#ffc233',0.95);
+  for(var j=1;j<=6;j++)ring(Y2,R4*j/6,'#ffc233',(j/6)*plasma(j+1)*0.5);
+  // THE PHANTOM — ring 8: hollow, dashed, flickering; the value that never appears
+  if(G.ghost){
+    var flick=0.28+0.30*(0.5+0.5*Math.sin(G.t*3.1));    // never solid — a ghost
+    ring(Y8,R8,'#ff4a4a',flick,true);
+    ring(Y8,R8*0.66,'#ff4a4a',flick*0.6,true);
+    label(R8+0.9,Y8,0,'8 · the pair that never formed','#ff8a8a');
+  }
+  // the ×4 fold: an arrow skipping the phantom (16 → 4, past 8)
+  (function(){var a=P(R16,Y3,0),b=P(R4,Y2,0);if(a&&b){g.strokeStyle='rgba(255,74,74,.5)';g.setLineDash([2,3]);g.beginPath();g.moveTo(a.x,a.y);g.lineTo(b.x,b.y);g.stroke();g.setLineDash([]);var mx=(a.x+b.x)/2+10,my=(a.y+b.y)/2;g.fillStyle='#ff6a6a';g.font='10px ui-monospace,monospace';g.fillText('×4 — skips 8',mx,my);}})();
+  // "the road not taken": the phantom PAIR torus at v=8 (what level 2 would be if pairs held)
+  if(G.road){
+    torus(Y2,R8,0.5,'#8a5a2a',0.32);
+    label(R8+0.9,Y2,0,'pairs would hold 8 here','#b98a52');
+  }
+  // labels for the real levels
+  label(R16+0.9,Y3,0,'16 · pairs (2·2³)','#ffb060');
+  label(R4+0.9,Y2,0,'4 · singles (2²)','#ffd98a');
+  g.fillStyle='#7a6a4a';g.font='10px ui-monospace,monospace';
+  g.fillText('the ring-8 lens · trained on the seam · the phantom flickers because it is never there',10,H-10);
+  requestAnimationFrame(tick);
+ }catch(e){
+  var c=document.getElementById('lens');try{var g=c.getContext('2d');g.fillStyle='#a52828';g.font='12px monospace';g.fillText('LENS FAULT: '+(e.message||e),12,20);}catch(_){}
+ }
+}
+</script>
+</body></html>
